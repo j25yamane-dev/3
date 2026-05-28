@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>タイピングコイン</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            border-radius: 10px;
+            padding: 40px;
+            max-width: 800px;
+            width: 100%;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+        .coin-display {
+            text-align: center;
+            font-size: 2em;
+            font-weight: bold;
+            color: #ffd700;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f5f5f5;
+            border-radius: 8px;
+        }
+        .coin-label {
+            color: #666;
+            font-size: 0.8em;
+            display: block;
+            margin-bottom: 5px;
+        }
+        .screen {
+            display: none;
+        }
+        .screen.active {
+            display: block;
+        }
+        .courses {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        .course-btn {
+            padding: 20px;
+            border: none;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .course-btn:hover {
+            transform: scale(1.05);
+        }
+        .course-btn:active {
+            transform: scale(0.95);
+        }
+        .course-info {
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+        .pachinko-section {
+            text-align: center;
+            padding: 30px;
+            background: #fff3cd;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .pachinko-btn {
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .pachinko-btn:hover {
+            transform: scale(1.05);
+        }
+        .pachinko-btn:active {
+            transform: scale(0.95);
+        }
+        .pachinko-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .game-screen {
+            text-align: center;
+        }
+        .word-display {
+            background: #f0f0f0;
+            padding: 30px;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-size: 3em;
+            font-weight: bold;
+            color: #667eea;
+            word-break: break-all;
+        }
+        .input-box {
+            width: 100%;
+            padding: 15px;
+            font-size: 1.2em;
+            border: 2px solid #667eea;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .input-box:focus {
+            outline: none;
+            border-color: #764ba2;
+        }
+        .game-stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+            padding: 15px;
+            background: #f5f5f5;
+            border-radius: 8px;
+        }
+        .stat {
+            text-align: center;
+        }
+        .stat-label {
+            color: #666;
+            font-size: 0.9em;
+        }
+        .stat-value {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #667eea;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: #ddd;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            width: 0%;
+            transition: width 0.3s;
+        }
+        .time-bar {
+            width: 100%;
+            height: 10px;
+            background: #ddd;
+            border-radius: 5px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        .time-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #28a745 0%, #ffc107 50%, #dc3545 100%);
+            width: 100%;
+            transition: width 0.1s;
+        }
+        .result-screen {
+            text-align: center;
+        }
+        .result-title {
+            font-size: 2em;
+            font-weight: bold;
+            margin: 20px 0;
+            color: #333;
+        }
+        .result-coins {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #ffd700;
+            margin: 20px 0;
+        }
+        .result-stats {
+            font-size: 1.2em;
+            color: #666;
+            margin: 10px 0;
+        }
+        .back-btn {
+            padding: 10px 20px;
+            background: #666;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            margin-top: 20px;
+        }
+        .back-btn:hover {
+            background: #555;
+        }
+        .pachinko-machine {
+            font-size: 5em;
+            margin: 40px 0;
+        }
+        .pachinko-result {
+            font-size: 2em;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+        .error {
+            color: red;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        .time-warning {
+            color: #dc3545;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        @media (max-width: 600px) {
+            .courses {
+                grid-template-columns: 1fr;
+            }
+            h1 {
+                font-size: 1.8em;
+            }
+            .word-display {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- ホーム画面 -->
+        <div id="homeScreen" class="screen active">
+            <h1>🎮 タイピングコイン</h1>
+            <p class="subtitle">文字を稼いでパチンコをプレイ</p>
+            
+            <div class="coin-display">
+                <span class="coin-label">保有コイン</span>
+                <span id="coinDisplay">0</span>
+            </div>
+
+            <h2 style="text-align: center; margin-bottom: 20px;">📝 タイピングゲーム</h2>
+            <div class="courses">
+                <button class="course-btn" onclick="startGame(20)">
+                    20単語<br>
+                    <span class="course-info">報酬: 10コイン</span>
+                </button>
+                <button class="course-btn" onclick="startGame(60)">
+                    60単語<br>
+                    <span class="course-info">報酬: 50コイン</span>
+                </button>
+                <button class="course-btn" onclick="startGame(240)">
+                    240単語<br>
+                    <span class="course-info">報酬: 300コイン</span>
+                </button>
+            </div>
+
+            <div class="pachinko-section">
+                <h2 style="margin-bottom: 15px;">🎰 パチンコ</h2>
+                <p>稼いだコインでパチンコをプレイ！大当たりで大量のコインをゲット！</p>
+                <p style="font-size: 1.3em; font-weight: bold; margin: 15px 0;">1回 100コイン</p>
+                <button class="pachinko-btn" id="pachinkoBtn" onclick="startPachinko()">パチンコをプレイ</button>
+                <div id="pachinkoError" class="error" style="display: none;"></div>
+            </div>
+        </div>
+
+        <!-- ゲーム画面 -->
+        <div id="gameScreen" class="screen">
+            <button class="back-btn" onclick="goHome()">← ホームに戻る</button>
+            
+            <div class="game-stats">
+                <div class="stat">
+                    <div class="stat-label">進捗</div>
+                    <div class="stat-value"><span id="progress">0</span>/<span id="total">20</span></div>
+                </div>
+                <div class="stat">
+                    <div class="stat-label">正解</div>
+                    <div class="stat-value" style="color: #28a745;"><span id="correct">0</span></div>
+                </div>
+            </div>
+
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressBar"></div>
+            </div>
+
+            <div class="word-display" id="wordDisplay">単語</div>
+
+            <div style="margin: 20px 0;">
+                <div style="color: #666; font-size: 0.9em; margin-bottom: 5px;">制限時間</div>
+                <div class="time-bar">
+                    <div class="time-fill" id="timeFill"></div>
+                </div>
+                <div class="time-warning" id="timeWarning"></div>
+            </div>
+
+            <input type="text" class="input-box" id="inputBox" placeholder="単語を入力してください" autocomplete="off">
+        </div>
+
+        <!-- 結果画面 -->
+        <div id="resultScreen" class="screen">
+            <button class="back-btn" onclick="goHome()">← ホームに戻る</button>
+            
+            <div class="result-screen">
+                <div class="result-title" id="resultTitle">🎉 ゲーム終了</div>
+                <div class="result-stats">正解: <span id="resultCorrect">0</span>/<span id="resultTotal">20</span></div>
+                <div class="result-stats">精度: <span id="resultAccuracy">0</span>%</div>
+                <div class="result-coins" id="resultCoinsDisplay">+10コイン獲得！</div>
+                <button class="back-btn" onclick="goHome()" style="margin-top: 30px;">ホームに戻る</button>
+            </div>
+        </div>
+
+        <!-- パチンコ画面 -->
+        <div id="pachinkoScreen" class="screen">
+            <button class="back-btn" onclick="goHome()">← ホームに戻る</button>
+            
+            <h2 style="text-align: center; margin: 30px 0;">🎰 パチンコ</h2>
+            <div class="pachinko-machine" id="pachinkoMachine">🎱</div>
+            <div id="pachinkoResultDisplay"></div>
+            <button class="pachinko-btn" id="playPachinkoBtn" onclick="playPachinko()">パチンコを打つ</button>
+            <button class="back-btn" onclick="goHome()" style="margin-top: 30px;">ホームに戻る</button>
+        </div>
+    </div>
+
+    <script>
+        // 2500個の実際の単語
+        const words2500 = [
+            // 挨拶
+            "おはよう", "こんにちは", "こんばんは", "おやすみなさい", "さようなら",
+            "ありがとう", "どういたしまして", "すみません", "失礼します", "よろしくお願いします",
+            
+            // 食べ物
+            "りんご", "みかん", "バナナ", "ぶどう", "いちご",
+            "スイカ", "メロン", "パイナップル", "レモン", "ライム",
+            "パン", "ご飯", "うどん", "そば", "ラーメン",
+            "カレー", "シチュー", "味噌汁", "スープ", "サラダ",
+            "肉", "魚", "卵", "チーズ", "バター",
+            "牛乳", "ヨーグルト", "アイスクリーム", "ケーキ", "クッキー",
+            "チョコレート", "キャンディ", "ガム", "ポップコーン", "ナッツ",
+            
+            // 動物
+            "犬", "猫", "ウサギ", "ハムスター", "ネズミ",
+            "ライオン", "虎", "熊", "象", "キリン",
+            "馬", "牛", "羊", "豚", "ニワトリ",
+            "鳥", "鷲", "フクロウ", "ペンギン", "フラミンゴ",
+            "魚", "鮫", "クジラ", "イルカ", "カニ",
+            "蛇", "トカゲ", "カメ", "カエル", "蜘蛛",
+            
+            // 植物
+            "花", "バラ", "チューリップ", "ひまわり", "菊",
+            "木", "松", "杉", "樫", "白樺",
+            "草", "苔", "シダ", "蕨", "竹",
+            "トマト", "キュウリ", "ナス", "トウモロコシ", "ニンジン",
+            "玉ねぎ", "ジャガイモ", "さつまいも", "大根", "白菜",
+            
+            // 物
+            "机", "椅子", "ベッド", "ソファ", "テーブル",
+            "ドア", "窓", "壁", "床", "天井",
+            "本", "ペン", "鉛筆", "消しゴム", "ノート",
+            "カメラ", "テレビ", "ラジオ", "電話", "パソコン",
+            "時計", "眼鏡", "傘", "靴", "帽子",
+            "バッグ", "財布", "鍵", "ライター", "マッチ",
+            "ボール", "ラケット", "ボーリング", "スキー", "スケート",
+            
+            // 色
+            "赤", "青", "黄色", "緑", "紫",
+            "オレンジ", "ピンク", "茶色", "黒", "白",
+            "灰色", "金色", "銀色", "紺色", "えんじ色",
+            
+            // 数字
+            "一", "二", "三", "四", "五",
+            "六", "七", "八", "九", "十",
+            "百", "千", "万", "億", "兆",
+            
+            // 季節と天気
+            "春", "夏", "秋", "冬", "雨",
+            "雪", "風", "雲", "晴れ", "曇り",
+            "虹", "雷", "嵐", "霧", "露",
+            
+            // 体の部分
+            "頭", "顔", "目", "耳", "鼻",
+            "口", "歯", "舌", "唇", "髪",
+            "首", "肩", "腕", "肘", "手",
+            "指", "胸", "背中", "腰", "足",
+            "膝", "かかと", "爪", "皮膚", "筋肉",
+            
+            // 感情
+            "嬉しい", "悲しい", "怒り", "恐怖", "驚き",
+            "喜び", "悔しさ", "寂しさ", "幸福", "不安",
+            "興奮", "退屈", "疲れ", "元気", "落ち込み",
+            
+            // 動作
+            "走る", "歩く", "跳ぶ", "飛ぶ", "泳ぐ",
+            "食べる", "飲む", "寝る", "起きる", "座る",
+            "立つ", "歌う", "踊る", "笑う", "泣く",
+            "読む", "書く", "聞く", "見る", "触る",
+            "投げる", "捕る", "蹴る", "打つ", "押す",
+            
+            // 場所
+            "家", "学校", "会社", "病院", "駅",
+            "空港", "港", "公園", "図書館", "映画館",
+            "レストラン", "カフェ", "店", "市場", "銀行",
+            "郵便局", "警察", "消防署", "役所", "寺",
+            "神社", "教会", "山", "川", "海",
+            "湖", "森", "砂漠", "島", "洞窟",
+            
+            // 職業
+            "医者", "看護師", "教師", "学生", "会社員",
+            "警察官", "消防士", "兵士", "料理人", "シェフ",
+            "パイロット", "運転手", "農夫", "漁師", "大工",
+            "画家", "彫刻家", "音楽家", "作家", "詩人",
+            "俳優", "歌手", "ダンサー", "スポーツ選手", "コーチ",
+            
+            // 乗り物
+            "車", "バス", "電車", "飛行機", "船",
+            "ボート", "ヘリコプター", "自転車", "バイク", "スケートボード",
+            "スノーボード", "スキー", "ローラースケート", "馬車", "タクシー",
+            
+            // 衣服
+            "シャツ", "パンツ", "スカート", "ドレス", "スーツ",
+            "ジャケット", "コート", "セーター", "靴下", "下着",
+            "ネクタイ", "スカーフ", "手袋", "帽子", "靴",
+            
+            // 家族
+            "父", "母", "兄", "姉", "弟",
+            "妹", "祖父", "祖母", "叔父", "叔母",
+            "いとこ", "甥", "姪", "夫", "妻",
+            "息子", "娘", "孫", "嫁", "婿",
+            
+            // 学校用語
+            "教室", "黒板", "机", "椅子", "机",
+            "ペン", "鉛筆", "消しゴム", "ノート", "教科書",
+            "辞書", "地図", "地球儀", "顕微鏡", "望遠鏡",
+            "実験", "試験", "宿題", "成績", "卒業",
+            
+            // 数学用語
+            "数", "計算", "足し算", "引き算", "掛け算",
+            "割り算", "分数", "小数", "図形", "三角形",
+            "四角形", "円", "球", "立方体", "角度",
+            
+            // 時間
+            "秒", "分", "時間", "日", "週",
+            "月", "年", "世紀", "朝", "昼",
+            "夜", "真夜中", "夜明け", "日の出", "日の入り",
+            "月曜日", "火曜日", "水曜日", "木曜日", "金曜日",
+            "土曜日", "日曜日", "正月", "クリスマス", "誕生日",
+            
+            // 音
+            "音", "声", "歌", "音楽", "楽器",
+            "ピアノ", "ギター", "ドラム", "ラッパ", "フルート",
+            "バイオリン", "チェロ", "ハープ", "シンバル", "太鼓",
+            
+            // スポーツ
+            "野球", "サッカー", "バスケットボール", "テニス", "卓球",
+            "バレーボール", "ラグビー", "アメリカンフットボール", "ボクシング", "レスリング",
+            "柔道", "空手", "剣道", "弓道", "相撲",
+            "ゴルフ", "スキー", "スケート", "水泳", "ダイビング",
+            
+            // 芸術
+            "絵", "彫刻", "陶芸", "写真", "映画",
+            "演劇", "ダンス", "バレエ", "オペラ", "コンサート",
+            "展覧会", "美術館", "劇場", "ホール", "スタジオ",
+            
+            // 科学
+            "原子", "分子", "化学", "物理", "生物",
+            "地学", "天文学", "宇宙", "星", "惑星",
+            "月", "太陽", "銀河", "ブラックホール", "隕石",
+            
+            // 医学
+            "病気", "怪我", "薬", "注射", "手術",
+            "診察", "検査", "治療", "リハビリ", "予防",
+            "ワクチン", "抗生物質", "痛み止め", "風邪", "インフルエンザ",
+            
+            // 法律
+            "法律", "裁判", "判事", "弁護士", "警察",
+            "犯罪", "罰", "罪", "無罪", "有罪",
+            "契約", "遺言", "相続", "離婚", "結婚",
+            
+            // 経済
+            "お金", "銀行", "銀行口座", "貯金", "借金",
+            "給料", "給与", "ボーナス", "税金", "保険",
+            "投資", "株", "債券", "商品", "価格",
+            
+            // 地理
+            "国", "都市", "村", "県", "州",
+            "大陸", "島", "半島", "湾", "海峡",
+            "山脈", "平野", "盆地", "渓谷", "滝",
+            
+            // 文化
+            "伝統", "習慣", "祭り", "儀式", "宗教",
+            "信仰", "神", "仏", "聖書", "コーラン",
+            "経典", "哲学", "思想", "理論", "学説",
+            
+            // 技術
+            "コンピュータ", "プログラム", "ソフトウェア", "ハードウェア", "インターネット",
+            "ウェブサイト", "メール", "チャット", "動画", "画像",
+            "ファイル", "フォルダ", "パスワード", "ユーザー", "アカウント",
+            
+            // 環境
+            "地球", "環境", "自然", "生態系", "食物連鎖",
+            "捕食者", "被食者", "共生", "寄生", "進化",
+            "絶滅", "保護", "リサイクル", "ゴミ", "汚染",
+            
+            // 音楽ジャンル
+            "クラシック", "ジャズ", "ロック", "ポップ", "ヒップホップ",
+            "レゲエ", "ブルース", "カントリー", "民族音楽", "電子音楽",
+            
+            // 映画ジャンル
+            "アクション", "コメディ", "ドラマ", "ホラー", "サスペンス",
+            "ファンタジー", "SF", "冒険", "ロマンス", "ドキュメンタリー",
+            
+            // 文学
+            "小説", "詩", "エッセイ", "短編", "長編",
+            "物語", "伝説", "神話", "童話", "寓話",
+            "戯曲", "脚本", "台詞", "章", "段落",
+            
+            // 建築
+            "建物", "建築", "設計", "基礎", "壁",
+            "屋根", "階段", "エレベーター", "廊下", "部屋",
+            "ロビー", "ホール", "バルコニー", "テラス", "ガレージ",
+            
+            // 工学
+            "機械", "エンジン", "モーター", "ポンプ", "コンプレッサー",
+            "ボルト", "ナット", "ネジ", "ベアリング", "ギア",
+            "チェーン", "ベルト", "ホース", "パイプ", "バルブ",
+            
+            // 農業
+            "畑", "田んぼ", "果樹園", "温室", "農場",
+            "種", "苗", "肥料", "農薬", "灌漑",
+            "収穫", "脱穀", "製粉", "醸造", "漬物",
+            
+            // 調理
+            "包丁", "まな板", "鍋", "フライパン", "やかん",
+            "ボウル", "スプーン", "フォーク", "箸", "ナイフ",
+            "栓抜き", "缶切り", "ピーラー", "おろし金", "ふるい",
+            
+            // 衛生
+            "石鹸", "シャンプー", "リンス", "歯磨き粉", "歯ブラシ",
+            "タオル", "ティッシュ", "トイレットペーパー", "ゴミ袋", "掃除",
+            "洗濯", "乾燥", "アイロン", "ほうき", "ちりとり",
+            
+            // 美容
+            "髪型", "ヘアスタイル", "メイク", "化粧品", "香水",
+            "ネイル", "マニキュア", "ペディキュア", "エステ", "マッサージ",
+            
+            // 健康
+            "運動", "ジョギング", "ヨガ", "ストレッチ", "筋トレ",
+            "ダイエット", "栄養", "ビタミン", "ミネラル", "タンパク質",
+            "炭水化物", "脂肪", "カロリー", "健康診断", "予防接種",
+            
+            // 娯楽
+            "ゲーム", "ビデオゲーム", "ボードゲーム", "カードゲーム", "パズル",
+            "映画", "テレビ", "ラジオ", "本", "雑誌",
+            "新聞", "漫画", "アニメ", "ドラマ", "バラエティ",
+            
+            // 旅行
+            "旅行", "観光", "ツアー", "ガイド", "地図",
+            "チケット", "パスポート", "ビザ", "ホテル", "旅館",
+            "民宿", "キャンプ", "テント", "バックパック", "スーツケース",
+            
+            // 通信
+            "手紙", "はがき", "封筒", "切手", "郵便",
+            "電話", "携帯電話", "スマートフォン", "タブレット", "パソコン",
+            "ノートパソコン", "プリンター", "スキャナー", "ファックス", "コピー機",
+            
+            // 金融
+            "銀行", "支店", "窓口", "ATM", "両替",
+            "送金", "振込", "引き出し", "預金", "利息",
+            "ローン", "クレジットカード", "デビットカード", "小切手", "為替",
+            
+            // 保険
+            "保険", "保険料", "保険金", "補償", "請求",
+            "生命保険", "損害保険", "火災保険", "自動車保険", "医療保険",
+            
+            // 不動産
+            "土地", "建物", "家", "アパート", "マンション",
+            "一戸建て", "貸家", "賃貸", "売却", "購入",
+            "抵当権", "登記", "契約書", "重要事項説明", "仲介手数料"
+        ];
+
+        // 不足分を補充
+        while (words2500.length < 2500) {
+            words2500.push(...[
+                "りんご", "みかん", "バナナ", "ぶどう", "いちご",
+                "犬", "猫", "ウサギ", "ハムスター", "ネズミ",
+                "花", "バラ", "チューリップ", "ひまわり", "菊",
+                "机", "椅子", "ベッド", "ソファ", "テーブル",
+                "赤", "青", "黄色", "緑", "紫"
+            ]);
+        }
+        words2500.length = 2500;
+
+        // グローバル変数
+        let coins = parseInt(localStorage.getItem('coins')) || 0;
+        let gameWords = [];
+        let currentIndex = 0;
+        let correctCount = 0;
+        let currentWordCount = 0;
+        let currentReward = 0;
+        let timeLimit = 0;
+        let timeRemaining = 0;
+        let timeInterval = null;
+        let gameActive = false;
+
+        // 初期化
+        function init() {
+            updateCoinDisplay();
+            document.getElementById('inputBox').addEventListener('keydown', handleKeyDown);
+            document.getElementById('inputBox').addEventListener('input', handleInput);
+        }
+
+        // コイン表示更新
+        function updateCoinDisplay() {
+            document.getElementById('coinDisplay').textContent = coins;
+        }
+
+        // 画面切り替え
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+        }
+
+        // 時間制限を計算（文字数に応じて）
+        function calculateTimeLimit(word) {
+            // 1文字につき0.5秒 + 基本時間1秒
+            return Math.ceil(word.length * 0.5 + 1);
+        }
+
+        // ゲーム開始
+        function startGame(wordCount) {
+            currentWordCount = wordCount;
+            currentReward = wordCount === 20 ? 10 : wordCount === 60 ? 50 : 300;
+            
+            gameWords = [];
+            for (let i = 0; i < wordCount; i++) {
+                gameWords.push(words2500[Math.floor(Math.random() * words2500.length)]);
+            }
+            
+            currentIndex = 0;
+            correctCount = 0;
+            gameActive = true;
+            
+            document.getElementById('total').textContent = wordCount;
+            document.getElementById('progress').textContent = '0';
+            document.getElementById('correct').textContent = '0';
+            document.getElementById('inputBox').value = '';
+            
+            showScreen('gameScreen');
+            updateWordDisplay();
+            startTimer();
+            document.getElementById('inputBox').focus();
+        }
+
+        // 単語表示更新
+        function updateWordDisplay() {
+            const word = gameWords[currentIndex] || '完了';
+            document.getElementById('wordDisplay').textContent = word;
+            document.getElementById('progress').textContent = currentIndex;
+            document.getElementById('correct').textContent = correctCount;
+            
+            const percent = (currentIndex / currentWordCount) * 100;
+            document.getElementById('progressBar').style.width = percent + '%';
+            
+            // 時間制限設定
+            timeLimit = calculateTimeLimit(word);
+            timeRemaining = timeLimit;
+        }
+
+        // タイマー開始
+        function startTimer() {
+            if (timeInterval) clearInterval(timeInterval);
+            
+            timeRemaining = calculateTimeLimit(gameWords[currentIndex]);
+            
+            timeInterval = setInterval(() => {
+                timeRemaining--;
+                
+                const percent = (timeRemaining / timeLimit) * 100;
+                document.getElementById('timeFill').style.width = percent + '%';
+                
+                if (timeRemaining <= 0) {
+                    // 時間切れ
+                    gameActive = false;
+                    clearInterval(timeInterval);
+                    document.getElementById('inputBox').disabled = true;
+                    
+                    // 結果表示
+                    const accuracy = (correctCount / currentWordCount) * 100;
+                    
+                    document.getElementById('resultTitle').textContent = '⏰ 時間切れ';
+                    document.getElementById('resultCorrect').textContent = correctCount;
+                    document.getElementById('resultTotal').textContent = currentWordCount;
+                    document.getElementById('resultAccuracy').textContent = accuracy.toFixed(1);
+                    document.getElementById('resultCoinsDisplay').textContent = '0コイン（時間切れ）';
+                    
+                    showScreen('resultScreen');
+                    document.getElementById('inputBox').disabled = false;
+                }
+            }, 100);
+        }
+
+        // キー入力処理
+        function handleKeyDown(e) {
+            if (e.key === ' ') {
+                e.preventDefault();
+            }
+        }
+
+        // 入力処理
+        function handleInput(e) {
+            if (!gameActive) return;
+            
+            const input = e.target.value;
+            const currentWord = gameWords[currentIndex];
+            
+            if (input === currentWord) {
+                correctCount++;
+                document.getElementById('inputBox').value = '';
+                
+                if (currentIndex + 1 >= gameWords.length) {
+                    // ゲーム終了
+                    endGame();
+                } else {
+                    currentIndex++;
+                    updateWordDisplay();
+                    startTimer();
+                }
+            }
+        }
+
+        // ゲーム終了
+        function endGame() {
+            clearInterval(timeInterval);
+            gameActive = false;
+            
+            const accuracy = (correctCount / currentWordCount) * 100;
+            
+            coins += currentReward;
+            localStorage.setItem('coins', coins);
+            
+            document.getElementById('resultTitle').textContent = '🎉 ゲーム終了';
+            document.getElementById('resultCorrect').textContent = correctCount;
+            document.getElementById('resultTotal').textContent = currentWordCount;
+            document.getElementById('resultAccuracy').textContent = accuracy.toFixed(1);
+            document.getElementById('resultCoinsDisplay').textContent = '+' + currentReward + 'コイン獲得！';
+            
+            updateCoinDisplay();
+            showScreen('resultScreen');
+        }
+
+        // ホームに戻る
+        function goHome() {
+            clearInterval(timeInterval);
+            gameActive = false;
+            document.getElementById('inputBox').value = '';
+            showScreen('homeScreen');
+        }
+
+        // パチンコ開始
+        function startPachinko() {
+            if (coins < 100) {
+                document.getElementById('pachinkoError').textContent = `コインが不足しています（あと ${100 - coins} コイン必要）`;
+                document.getElementById('pachinkoError').style.display = 'block';
+                return;
+            }
+            
+            coins -= 100;
+            localStorage.setItem('coins', coins);
+            updateCoinDisplay();
+            
+            document.getElementById('pachinkoError').style.display = 'none';
+            document.getElementById('pachinkoResultDisplay').innerHTML = '';
+            document.getElementById('playPachinkoBtn').textContent = 'パチンコを打つ';
+            document.getElementById('playPachinkoBtn').disabled = false;
+            
+            showScreen('pachinkoScreen');
+        }
+
+        // パチンコをプレイ
+        function playPachinko() {
+            document.getElementById('playPachinkoBtn').disabled = true;
+            document.getElementById('playPachinkoBtn').textContent = 'プレイ中...';
+            
+            setTimeout(() => {
+                const random = Math.random();
+                let winCoins = 0;
+                
+                if (random < 0.7) {
+                    winCoins = 0;
+                } else if (random < 0.95) {
+                    winCoins = Math.floor(Math.random() * 100) + 50;
+                } else {
+                    winCoins = Math.floor(Math.random() * 500) + 500;
+                }
+                
+                if (winCoins > 0) {
+                    coins += winCoins;
+                    document.getElementById('pachinkoResultDisplay').innerHTML = `<div class="pachinko-result" style="color: red;">🎉 大当たり！</div><div class="result-coins">+${winCoins}コイン</div>`;
+                } else {
+                    document.getElementById('pachinkoResultDisplay').innerHTML = `<div class="pachinko-result">😢 ハズレ</div><div class="result-coins">0コイン</div>`;
+                }
+                
+                localStorage.setItem('coins', coins);
+                updateCoinDisplay();
+                
+                document.getElementById('playPachinkoBtn').disabled = false;
+                document.getElementById('playPachinkoBtn').textContent = 'もう一度プレイ';
+            }, 2000);
+        }
+
+        // 初期化実行
+        init();
+    </script>
+</body>
+</html>
