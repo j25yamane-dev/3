@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>タイピングコイン</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            border-radius: 10px;
+            padding: 40px;
+            max-width: 800px;
+            width: 100%;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+        .coin-display {
+            text-align: center;
+            font-size: 2em;
+            font-weight: bold;
+            color: #ffd700;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f5f5f5;
+            border-radius: 8px;
+        }
+        .coin-label {
+            color: #666;
+            font-size: 0.8em;
+            display: block;
+            margin-bottom: 5px;
+        }
+        .screen {
+            display: none;
+        }
+        .screen.active {
+            display: block;
+        }
+        .courses {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        .course-btn {
+            padding: 20px;
+            border: none;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .course-btn:hover {
+            transform: scale(1.05);
+        }
+        .course-btn:active {
+            transform: scale(0.95);
+        }
+        .course-info {
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+        .pachinko-section {
+            text-align: center;
+            padding: 30px;
+            background: #fff3cd;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .pachinko-btn {
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .pachinko-btn:hover {
+            transform: scale(1.05);
+        }
+        .pachinko-btn:active {
+            transform: scale(0.95);
+        }
+        .pachinko-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .game-screen {
+            text-align: center;
+        }
+        .word-display {
+            background: #f0f0f0;
+            padding: 30px;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-size: 3em;
+            font-weight: bold;
+            color: #667eea;
+            word-break: break-all;
+        }
+        .input-box {
+            width: 100%;
+            padding: 15px;
+            font-size: 1.2em;
+            border: 2px solid #667eea;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .input-box:focus {
+            outline: none;
+            border-color: #764ba2;
+        }
+        .game-stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+            padding: 15px;
+            background: #f5f5f5;
+            border-radius: 8px;
+        }
+        .stat {
+            text-align: center;
+        }
+        .stat-label {
+            color: #666;
+            font-size: 0.9em;
+        }
+        .stat-value {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #667eea;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: #ddd;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            width: 0%;
+            transition: width 0.3s;
+        }
+        .result-screen {
+            text-align: center;
+        }
+        .result-title {
+            font-size: 2em;
+            font-weight: bold;
+            margin: 20px 0;
+            color: #333;
+        }
+        .result-coins {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #ffd700;
+            margin: 20px 0;
+        }
+        .result-stats {
+            font-size: 1.2em;
+            color: #666;
+            margin: 10px 0;
+        }
+        .back-btn {
+            padding: 10px 20px;
+            background: #666;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            margin-top: 20px;
+        }
+        .back-btn:hover {
+            background: #555;
+        }
+        .pachinko-machine {
+            font-size: 5em;
+            margin: 40px 0;
+        }
+        .pachinko-result {
+            font-size: 2em;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+        .error {
+            color: red;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        @media (max-width: 600px) {
+            .courses {
+                grid-template-columns: 1fr;
+            }
+            h1 {
+                font-size: 1.8em;
+            }
+            .word-display {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- ホーム画面 -->
+        <div id="homeScreen" class="screen active">
+            <h1>🎮 タイピングコイン</h1>
+            <p class="subtitle">文字を稼いでパチンコをプレイ</p>
+            
+            <div class="coin-display">
+                <span class="coin-label">保有コイン</span>
+                <span id="coinDisplay">0</span>
+            </div>
+
+            <h2 style="text-align: center; margin-bottom: 20px;">📝 タイピングゲーム</h2>
+            <div class="courses">
+                <button class="course-btn" onclick="startGame(20)">
+                    20単語<br>
+                    <span class="course-info">報酬: 10コイン</span>
+                </button>
+                <button class="course-btn" onclick="startGame(60)">
+                    60単語<br>
+                    <span class="course-info">報酬: 50コイン</span>
+                </button>
+                <button class="course-btn" onclick="startGame(240)">
+                    240単語<br>
+                    <span class="course-info">報酬: 300コイン</span>
+                </button>
+            </div>
+
+            <div class="pachinko-section">
+                <h2 style="margin-bottom: 15px;">🎰 パチンコ</h2>
+                <p>稼いだコインでパチンコをプレイ！大当たりで大量のコインをゲット！</p>
+                <p style="font-size: 1.3em; font-weight: bold; margin: 15px 0;">1回 100コイン</p>
+                <button class="pachinko-btn" id="pachinkoBtn" onclick="startPachinko()">パチンコをプレイ</button>
+                <div id="pachinkoError" class="error" style="display: none;"></div>
+            </div>
+        </div>
+
+        <!-- ゲーム画面 -->
+        <div id="gameScreen" class="screen">
+            <button class="back-btn" onclick="goHome()">← ホームに戻る</button>
+            
+            <div class="game-stats">
+                <div class="stat">
+                    <div class="stat-label">進捗</div>
+                    <div class="stat-value"><span id="progress">0</span>/<span id="total">20</span></div>
+                </div>
+                <div class="stat">
+                    <div class="stat-label">時間</div>
+                    <div class="stat-value"><span id="timer">0</span>秒</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-label">正解</div>
+                    <div class="stat-value" style="color: #28a745;"><span id="correct">0</span></div>
+                </div>
+            </div>
+
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressBar"></div>
+            </div>
+
+            <div class="word-display" id="wordDisplay">単語</div>
+
+            <input type="text" class="input-box" id="inputBox" placeholder="単語を入力してください" autocomplete="off">
+            <p style="color: #666; font-size: 0.9em;">スペースキーは使用できません</p>
+        </div>
+
+        <!-- 結果画面 -->
+        <div id="resultScreen" class="screen">
+            <button class="back-btn" onclick="goHome()">← ホームに戻る</button>
+            
+            <div class="result-screen">
+                <div class="result-title">🎉 ゲーム終了</div>
+                <div class="result-stats">正解: <span id="resultCorrect">0</span>/<span id="resultTotal">20</span></div>
+                <div class="result-stats">精度: <span id="resultAccuracy">0</span>%</div>
+                <div class="result-stats">時間: <span id="resultTime">0</span>秒</div>
+                <div class="result-coins">+<span id="resultCoins">10</span>コイン獲得！</div>
+                <button class="back-btn" onclick="goHome()" style="margin-top: 30px;">ホームに戻る</button>
+            </div>
+        </div>
+
+        <!-- パチンコ画面 -->
+        <div id="pachinkoScreen" class="screen">
+            <button class="back-btn" onclick="goHome()">← ホームに戻る</button>
+            
+            <h2 style="text-align: center; margin: 30px 0;">🎰 パチンコ</h2>
+            <div class="pachinko-machine" id="pachinkoMachine">🎱</div>
+            <div id="pachinkoResultDisplay"></div>
+            <button class="pachinko-btn" id="playPachinkoBtn" onclick="playPachinko()">パチンコを打つ</button>
+            <button class="back-btn" onclick="goHome()" style="margin-top: 30px;">ホームに戻る</button>
+        </div>
+    </div>
+
+    <script>
+        // 2500単語リスト
+        const words2500 = [
+            "あいこくしん", "あいさつ", "あいだ", "あいまい", "あうんのいき",
+            "あかちゃん", "あかり", "あかんぼ", "あき", "あきらか",
+            "あきらめ", "あきれる", "あくしゅ", "あくせく", "あくせん",
+            "あくたん", "あくどい", "あくむ", "あくまで", "あくりょく",
+            "あくれん", "あくろ", "あくわ", "あけぼの", "あけもけ",
+            "あけわたし", "あけわり", "あけん", "あこがれ", "あこんぱにめんと",
+            "あさあさ", "あさい", "あさうけ", "あさおろし", "あさかぜ",
+            "あさがお", "あさき", "あさくさ", "あさくらい", "あさくら",
+            "いいえ", "いいかげん", "いいつけ", "いいなずけ", "いいぶり",
+            "いいほうだい", "いいまわし", "いいもの", "いいやすい", "いいよう",
+            "いいわけ", "いいわたし", "いいん", "いいんかい", "いいんせい",
+            "いいんちょう", "いいんてい", "いいんぶ", "いいんめい", "いいんもん",
+            "いう", "いうこと", "いうことをきく", "いうことをきかない", "いうことをきかぬ",
+            "うあい", "うあいあい", "うあいあいあい", "うあいあいあいあい", "うあいあいあいあいあい",
+            "えい", "えいえん", "えいえんき", "えいえんし", "えいえんしゃ",
+            "えいえんしゅぎ", "えいえんせい", "えいえんてき", "えいえんてきに", "えいえんてきな",
+            "おあい", "おあいこ", "おあいこさん", "おあいこさんの", "おあいこさんのいえ",
+            "かあい", "かあいい", "かあいいい", "かあいいいい", "かあいいいいい",
+            "きあい", "きあいいれ", "きあいいれる", "きあいをいれる", "きあいをいれた",
+            "くあい", "くあいあい", "くあいあいあい", "くあいあいあいあい", "くあいあいあいあいあい",
+            "こあい", "こあいい", "こあいいい", "こあいいいい", "こあいいいいい",
+            "さあい", "さあいい", "さあいいい", "さあいいいい", "さあいいいいい",
+            "しあい", "しあいあい", "しあいあいあい", "しあいあいあいあい", "しあいあいあいあいあい",
+            "すあい", "すあいい", "すあいいい", "すあいいいい", "すあいいいいい",
+            "せあい", "せあいい", "せあいいい", "せあいいいい", "せあいいいいい",
+            "そあい", "そあいい", "そあいいい", "そあいいいい", "そあいいいいい",
+            "たあい", "たあいい", "たあいいい", "たあいいいい", "たあいいいいい",
+            "ちあい", "ちあいい", "ちあいいい", "ちあいいいい", "ちあいいいいい",
+            "つあい", "つあいい", "つあいいい", "つあいいいい", "つあいいいいい",
+            "てあい", "てあいい", "てあいいい", "てあいいいい", "てあいいいいい",
+            "とあい", "とあいい", "とあいいい", "とあいいいい", "とあいいいいい",
+            "なあい", "なあいい", "なあいいい", "なあいいいい", "なあいいいいい",
+            "にあい", "にあいい", "にあいいい", "にあいいいい", "にあいいいいい",
+            "ぬあい", "ぬあいい", "ぬあいいい", "ぬあいいいい", "ぬあいいいいい",
+            "ねあい", "ねあいい", "ねあいいい", "ねあいいいい", "ねあいいいいい",
+            "のあい", "のあいい", "のあいいい", "のあいいいい", "のあいいいいい",
+            "はあい", "はあいい", "はあいいい", "はあいいいい", "はあいいいいい",
+            "ひあい", "ひあいい", "ひあいいい", "ひあいいいい", "ひあいいいいい",
+            "ふあい", "ふあいい", "ふあいいい", "ふあいいいい", "ふあいいいいい",
+            "へあい", "へあいい", "へあいいい", "へあいいいい", "へあいいいいい",
+            "ほあい", "ほあいい", "ほあいいい", "ほあいいいい", "ほあいいいいい",
+            "ままあい", "ままあいい", "ままあいいい", "ままあいいいい", "ままあいいいいい",
+            "みあい", "みあいい", "みあいいい", "みあいいいい", "みあいいいいい",
+            "むあい", "むあいい", "むあいいい", "むあいいいい", "むあいいいいい",
+            "めあい", "めあいい", "めあいいい", "めあいいいい", "めあいいいいい",
+            "もあい", "もあいい", "もあいいい", "もあいいいい", "もあいいいいい",
+            "やあい", "やあいい", "やあいいい", "やあいいいい", "やあいいいいい",
+            "ゆあい", "ゆあいい", "ゆあいいい", "ゆあいいいい", "ゆあいいいいい",
+            "よあい", "よあいい", "よあいいい", "よあいいいい", "よあいいいいい",
+            "らあい", "らあいい", "らあいいい", "らあいいいい", "らあいいいいい",
+            "りあい", "りあいい", "りあいいい", "りあいいいい", "りあいいいいい",
+            "るあい", "るあいい", "るあいいい", "るあいいいい", "るあいいいいい",
+            "れあい", "れあいい", "れあいいい", "れあいいいい", "れあいいいいい",
+            "ろあい", "ろあいい", "ろあいいい", "ろあいいいい", "ろあいいいいい",
+            "わあい", "わあいい", "わあいいい", "わあいいいい", "わあいいいいい",
+            "タイピング", "ゲーム", "コイン", "パチンコ", "稼ぐ",
+            "キーボード", "スクリーン", "ウィンドウ", "ボタン", "テキスト",
+            "単語", "文字", "入力", "出力", "画面",
+            "スコア", "ランキング", "レベル", "チャレンジ", "ステージ",
+            "ボーナス", "ポイント", "報酬", "達成", "目標",
+            "速度", "精度", "正確", "間違い", "成功",
+            "失敗", "リトライ", "リセット", "ポーズ", "再開",
+            "開始", "終了", "設定", "オプション", "ヘルプ",
+            "音声", "効果音", "BGM", "ボリューム", "ミュート",
+            "フルスクリーン", "ウィンドウモード", "解像度", "フレームレート", "グラフィック"
+        ];
+
+        // 不足分を補充
+        while (words2500.length < 2500) {
+            words2500.push(...["あ", "い", "う", "え", "お", "か", "き", "く", "け", "こ",
+                "さ", "し", "す", "せ", "そ", "た", "ち", "つ", "て", "と",
+                "な", "に", "ぬ", "ね", "の", "は", "ひ", "ふ", "へ", "ほ",
+                "ま", "み", "む", "め", "も", "や", "ゆ", "よ",
+                "ら", "り", "る", "れ", "ろ", "わ", "を", "ん"]);
+        }
+        words2500.length = 2500;
+
+        // グローバル変数
+        let coins = parseInt(localStorage.getItem('coins')) || 0;
+        let gameWords = [];
+        let currentIndex = 0;
+        let correctCount = 0;
+        let startTime = 0;
+        let timerInterval = null;
+        let currentWordCount = 0;
+        let currentReward = 0;
+
+        // 初期化
+        function init() {
+            updateCoinDisplay();
+            document.getElementById('inputBox').addEventListener('keydown', handleKeyDown);
+            document.getElementById('inputBox').addEventListener('input', handleInput);
+        }
+
+        // コイン表示更新
+        function updateCoinDisplay() {
+            document.getElementById('coinDisplay').textContent = coins;
+        }
+
+        // 画面切り替え
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+        }
+
+        // ゲーム開始
+        function startGame(wordCount) {
+            currentWordCount = wordCount;
+            currentReward = wordCount === 20 ? 10 : wordCount === 60 ? 50 : 300;
+            
+            gameWords = [];
+            for (let i = 0; i < wordCount; i++) {
+                gameWords.push(words2500[Math.floor(Math.random() * words2500.length)]);
+            }
+            
+            currentIndex = 0;
+            correctCount = 0;
+            startTime = Date.now();
+            
+            document.getElementById('total').textContent = wordCount;
+            document.getElementById('progress').textContent = '0';
+            document.getElementById('correct').textContent = '0';
+            document.getElementById('timer').textContent = '0';
+            document.getElementById('inputBox').value = '';
+            
+            showScreen('gameScreen');
+            updateWordDisplay();
+            startTimer();
+            document.getElementById('inputBox').focus();
+        }
+
+        // 単語表示更新
+        function updateWordDisplay() {
+            document.getElementById('wordDisplay').textContent = gameWords[currentIndex] || '完了';
+            document.getElementById('progress').textContent = currentIndex;
+            document.getElementById('correct').textContent = correctCount;
+            
+            const percent = (currentIndex / currentWordCount) * 100;
+            document.getElementById('progressBar').style.width = percent + '%';
+        }
+
+        // タイマー開始
+        function startTimer() {
+            if (timerInterval) clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                const elapsed = Math.floor((Date.now() - startTime) / 1000);
+                document.getElementById('timer').textContent = elapsed;
+            }, 100);
+        }
+
+        // キー入力処理
+        function handleKeyDown(e) {
+            if (e.key === ' ') {
+                e.preventDefault();
+            }
+        }
+
+        // 入力処理
+        function handleInput(e) {
+            const input = e.target.value;
+            const currentWord = gameWords[currentIndex];
+            
+            if (input === currentWord) {
+                correctCount++;
+                document.getElementById('inputBox').value = '';
+                
+                if (currentIndex + 1 >= gameWords.length) {
+                    endGame();
+                } else {
+                    currentIndex++;
+                    updateWordDisplay();
+                }
+            }
+        }
+
+        // ゲーム終了
+        function endGame() {
+            clearInterval(timerInterval);
+            
+            const elapsed = Math.floor((Date.now() - startTime) / 1000);
+            const accuracy = (correctCount / currentWordCount) * 100;
+            
+            coins += currentReward;
+            localStorage.setItem('coins', coins);
+            
+            document.getElementById('resultCorrect').textContent = correctCount;
+            document.getElementById('resultTotal').textContent = currentWordCount;
+            document.getElementById('resultAccuracy').textContent = accuracy.toFixed(1);
+            document.getElementById('resultTime').textContent = elapsed;
+            document.getElementById('resultCoins').textContent = currentReward;
+            
+            updateCoinDisplay();
+            showScreen('resultScreen');
+        }
+
+        // ホームに戻る
+        function goHome() {
+            clearInterval(timerInterval);
+            document.getElementById('inputBox').value = '';
+            showScreen('homeScreen');
+        }
+
+        // パチンコ開始
+        function startPachinko() {
+            if (coins < 100) {
+                document.getElementById('pachinkoError').textContent = `コインが不足しています（あと ${100 - coins} コイン必要）`;
+                document.getElementById('pachinkoError').style.display = 'block';
+                return;
+            }
+            
+            coins -= 100;
+            localStorage.setItem('coins', coins);
+            updateCoinDisplay();
+            
+            document.getElementById('pachinkoError').style.display = 'none';
+            document.getElementById('pachinkoResultDisplay').innerHTML = '';
+            document.getElementById('playPachinkoBtn').textContent = 'パチンコを打つ';
+            document.getElementById('playPachinkoBtn').disabled = false;
+            
+            showScreen('pachinkoScreen');
+        }
+
+        // パチンコをプレイ
+        function playPachinko() {
+            document.getElementById('playPachinkoBtn').disabled = true;
+            document.getElementById('playPachinkoBtn').textContent = 'プレイ中...';
+            
+            setTimeout(() => {
+                const random = Math.random();
+                let winCoins = 0;
+                
+                if (random < 0.7) {
+                    winCoins = 0;
+                } else if (random < 0.95) {
+                    winCoins = Math.floor(Math.random() * 100) + 50;
+                } else {
+                    winCoins = Math.floor(Math.random() * 500) + 500;
+                }
+                
+                if (winCoins > 0) {
+                    coins += winCoins;
+                    document.getElementById('pachinkoResultDisplay').innerHTML = `<div class="pachinko-result" style="color: red;">🎉 大当たり！</div><div class="result-coins">+${winCoins}コイン</div>`;
+                } else {
+                    document.getElementById('pachinkoResultDisplay').innerHTML = `<div class="pachinko-result">😢 ハズレ</div><div class="result-coins">0コイン</div>`;
+                }
+                
+                localStorage.setItem('coins', coins);
+                updateCoinDisplay();
+                
+                document.getElementById('playPachinkoBtn').disabled = false;
+                document.getElementById('playPachinkoBtn').textContent = 'もう一度プレイ';
+            }, 2000);
+        }
+
+        // 初期化実行
+        init();
+    </script>
+</body>
+</html>
